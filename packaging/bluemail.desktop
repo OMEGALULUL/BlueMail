@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=BlueMail
+GenericName=Mail Client
+Comment=Free local desktop mail client (Gmail, Outlook, IMAP/POP3/SMTP)
+Exec=bluemail %u
+Icon=bluemail
+Terminal=false
+Categories=Network;Email;
+StartupNotify=true
+StartupWMClass=BlueMail

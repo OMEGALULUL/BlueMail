@@ -30,29 +30,72 @@ everything stays on your machine.
 
 No `pip install` needed.
 
-## Install
+## Quick start (from Git)
 
-`build.sh` produces three downloadable packages in `dist/`:
+```sh
+git clone https://github.com/<you>/BlueMail.git
+cd BlueMail
 
-| Package | How to use |
-|---|---|
-| `BlueMail-x86_64.AppImage` | `chmod +x` it, then double-click or run it — works on most Linux distros |
-| `bluemail_0.2.0_x86_64.deb` | `sudo dpkg -i bluemail_0.2.0_x86_64.deb` (Debian/Ubuntu/Mint) — adds a menu entry |
-| `BlueMail-linux-x86_64.tar.gz` | extract anywhere and run `BlueMail/BlueMail` |
+# Linux — one command sets everything up:
+./bluemail            # creates .venv, installs PyQt5, then launches the app
+./bluemail build      # builds the Linux app packages into dist/
+./bluemail install    # installs the built .deb system-wide
+```
 
-All packages bundle Python, PyQt5 and Qt — no dependencies to install.
-Data lives in `~/.config/bluemail/` regardless of how you run it
-(first run migrates any existing `~/.config/outlook-mail/` data).
+`./bluemail` is self-contained: it checks for Python 3, creates a virtual
+environment on first run, and installs only the PyQt5 runtime dependency.
+If you prefer to manage dependencies yourself:
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python main.py
+```
+
+## Installers
+
+| Platform | Artifact | Where it comes from |
+|---|---|---|
+| Linux | `BlueMail-x86_64.AppImage`, `bluemail_0.2.0_x86_64.deb`, `BlueMail-linux-x86_64.tar.gz` | `./bluemail build` (local) or CI → `bluemail-linux` |
+| Windows | `BlueMail-Setup-0.2.0.exe` — full installation wizard | CI → `bluemail-windows`, or local: `packaging/windows/BlueMail.iss` (Inno Setup) |
+| macOS | `BlueMail-0.2.0.pkg` — opens the macOS *Install BlueMail* wizard, plus `BlueMail.dmg` | CI → `bluemail-macos`, or local: `packaging/macos/build_pkg.sh` |
+
+Every artifact bundles Python, PyQt5 and Qt — no dependencies to install on
+the target machine. The Windows and macOS installers (plus the Linux set) are
+also built automatically on every `v*` tag via the GitHub Actions workflow
+`.github/workflows/build.yml`; download them from the Actions run or a
+release. macOS packages are unsigned, so first-time users must right-click →
+Open (Gatekeeper).
 
 ## Building release packages
 
 ```sh
+# Linux packages (AppImage / .deb / tar.gz)
+./bluemail build
+
+# or directly:
 ./build.sh
 ```
 
 Build tools: `pyinstaller`, `patchelf`, `desktop-file-utils`,
 `squashfs-tools` (apt), plus `appimagetool` (downloaded automatically
 if absent). Output: the AppImage, .deb and tarball in `dist/`.
+
+### Windows (local)
+
+```bat
+python -m pip install PyQt5 pyinstaller
+python -m PyInstaller --noconfirm --windowed --name BlueMail --paths . main.py
+ISCC.exe packaging\windows\BlueMail.iss   :: produces dist\BlueMail-Setup-0.2.0.exe
+```
+
+### macOS (local, must run on a Mac)
+
+```sh
+bash packaging/macos/build_pkg.sh          # produces BlueMail-0.2.0.pkg + BlueMail.dmg
+```
+
+Requires Xcode command-line tools (`pkgbuild`, `hdiutil`).
 
 ## Usage
 
@@ -78,7 +121,8 @@ python3 main.py --data-dir /path/to/data
 | `~/.config/bluemail/settings.json` | window/UI preferences |
 | `~/.config/bluemail/mail.db` | SQLite cache (folders, messages, raw) |
 
-`BLUEMAIL_HOME` overrides the base directory.
+`BLUEMAIL_HOME` overrides the base directory. First run migrates any
+existing `~/.config/outlook-mail/` data into the new location.
 
 ## Architecture
 

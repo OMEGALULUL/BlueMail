@@ -1,3 +1,70 @@
 #!/bin/sh
-# Launch BlueMail from a source checkout.
-cd "$(dirname "$0")" && exec python3 main.py "$@"
+# BlueMail — Linux launcher / setup helper for source checkouts.
+#
+#   ./bluemail           run BlueMail (auto-installs PyQt5 the first time)
+#   ./bluemail build     build Linux app packages (AppImage, .deb, tar.gz)
+#   ./bluemail install   install the built .deb system-wide
+#   ./bluemail console   launch without the auto-quiet flags
+set -e
+
+cd "$(dirname "$0")"
+
+# Prefer the system-installed app when running from an installed tree.
+if [ -x /opt/BlueMail/BlueMail ] && [ ! -f main.py ]; then
+    exec /opt/BlueMail/BlueMail "$@"
+fi
+
+PY=""
+if [ -x .venv/bin/python ]; then
+    PY=".venv/bin/python"
+elif command -v python3 >/dev/null 2>&1; then
+    PY="python3"
+fi
+
+if [ -z "$PY" ]; then
+    echo "error: python3 is required but was not found on PATH." >&2
+    exit 1
+fi
+
+setup_pyqt() {
+    echo "PyQt5 not found — creating a virtual environment and installing it…"
+    python3 -m venv .venv
+    .venv/bin/pip install --quiet --upgrade pip
+    .venv/bin/pip install --quiet PyQt5
+    echo "setup complete."
+}
+
+if ! "$PY" -c "import PyQt5" >/dev/null 2>&1; then
+    setup_pyqt
+fi
+
+case "$1" in
+    build)
+        shift
+        "$PY" -c "import PyInstaller" >/dev/null 2>&1 || \
+            .venv/bin/pip install --quiet pyinstaller
+        if [ -x .venv/bin ]; then
+            export PATH="$(dirname "$PY"):$PATH"
+        fi
+        exec ./build.sh "$@"
+        ;;
+    install)
+        shift
+        DEB=$(ls dist/bluemail_*.deb 2>/dev/null | head -n1 || true)
+        if [ -z "$DEB" ]; then
+            echo "No .deb found — run './bluemail build' first." >&2
+            exit 1
+        fi
+        if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then
+            exec sudo dpkg -i "$DEB"
+        fi
+        exec dpkg -i "$DEB"
+        ;;
+    console)
+        shift
+        exec "$PY" main.py "$@"
+        ;;
+    *)
+        exec "$PY" main.py "$@"
+        ;;
+esac

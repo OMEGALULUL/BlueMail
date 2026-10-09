@@ -1,0 +1,5 @@
+# Runtime dependency (bundled into release packages, needed to run from source).
+PyQt5>=5.15,<6
+
+# Build-time tooling.
+pyinstaller>=6.0

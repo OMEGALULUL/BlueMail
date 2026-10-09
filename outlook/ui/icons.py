@@ -296,6 +296,22 @@ def draw_account(p):
     p.drawPath(path)
 
 
+def draw_opencode(p):
+    from PyQt5.QtGui import QColor
+    p.setBrush(QColor(BLUE_DARK))
+    p.setPen(Qt.NoPen)
+    p.drawRoundedRect(QRectF(3, 5, 18, 14), 2, 2)
+    p.setBrush(QColor(WHITE))
+    p.drawRoundedRect(QRectF(4, 6, 16, 4), 1.2, 1.2)
+    p.setPen(QPen(QColor(WHITE), 1.6, Qt.SolidLine, Qt.RoundCap))
+    p.drawLine(QPointF(6.5, 13), QPointF(10, 13))
+    p.drawLine(QPointF(6.5, 17), QPointF(10, 17))
+    p.setPen(Qt.NoPen)
+    p.setBrush(QColor(GOLD))
+    p.drawRect(QRectF(11.5, 13.6, 4, 4))
+    p.drawRect(QRectF(11.5, 17.6, 4, 4))
+
+
 def draw_refresh(p):
     from PyQt5.QtGui import QColor
     p.setBrush(Qt.NoBrush)
@@ -405,6 +421,7 @@ _DRAWERS = {
     "pane_right": draw_reading_pane_right,
     "folder_pane": draw_folder_pane,
     "exit": draw_exit,
+    "opencode": draw_opencode,
 }
 
 

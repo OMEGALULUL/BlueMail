@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 os.environ["OT_NO_ANIM"] = "1"
@@ -321,6 +322,49 @@ class AnimationsBehaviorTests(unittest.TestCase):
             self.assertIsNone(getattr(container, "_ot_anim", None))
         finally:
             os.environ["OT_NO_ANIM"] = "1"
+
+
+class OpencodeDialogTests(unittest.TestCase):
+    """Opencode assistant dialog: modes, power fields, download fallback."""
+
+    def setUp(self):
+        self.app = QApplication.instance()
+        if self.app is None:
+            self.app = QApplication([])
+            from outlook.ui import theme
+            theme.apply_application_style(self.app)
+        from outlook.ui.opencode_dialog import OpencodeDialog
+        self.Dialog = OpencodeDialog
+
+    @mock.patch("outlook.opencode.is_installed", return_value=True)
+    def test_installed_shows_modes(self, _ok):
+        from outlook.ui.opencode_dialog import OpencodeDialog
+        dlg = OpencodeDialog()
+        dlg.show()
+        self.assertTrue(dlg.mode_buttons["quick"].isEnabled())
+        self.assertTrue(dlg.mode_buttons["think"].isEnabled())
+        self.assertTrue(dlg.mode_buttons["power"].isEnabled())
+        self.assertFalse(dlg.download_btn.isVisible())
+        dlg.close()
+
+    @mock.patch("outlook.opencode.is_installed", return_value=False)
+    def test_missing_shows_download(self, _ok):
+        dlg = self.Dialog()
+        dlg.show()
+        self.assertFalse(dlg.mode_buttons["quick"].isEnabled())
+        self.assertTrue(dlg.download_btn.isVisible())
+        self.assertEqual(dlg.download_btn.text(), "Download opencode")
+        dlg.close()
+
+    @mock.patch("outlook.opencode.is_installed", return_value=True)
+    def test_power_mode_reveals_inputs(self, _ok):
+        dlg = self.Dialog()
+        dlg.show()
+        self.assertFalse(dlg.field_row.isVisible())
+        dlg._pick("power")
+        self.assertTrue(dlg.field_row.isVisible())
+        self.assertEqual(dlg._mode, "power")
+        dlg.close()
 
 
 if __name__ == "__main__":

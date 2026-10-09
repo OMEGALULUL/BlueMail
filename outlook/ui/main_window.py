@@ -168,6 +168,10 @@ class MainWindow(QMainWindow):
             ribbon_button("Flag", "flag",
                           lambda: self.message_list.emit_action("toggle_flag")),
         ])
+        home.add_group("Smart", [
+            ribbon_button("Opencode", "opencode", self.open_opencode,
+                          tooltip="AI-assisted replies via the opencode CLI"),
+        ])
         home.add_stretch()
 
         sr = RibbonPanel()
@@ -180,7 +184,8 @@ class MainWindow(QMainWindow):
                           tooltip="Sync the current folder"),
         ])
         sr.add_group("Preferences", [
-            ribbon_button("Accounts", "account", self.open_account_settings),
+            ribbon_button("Accounts", "account",
+                          lambda: self.open_account_settings(None)),
         ])
         sr.add_stretch()
 
@@ -1369,6 +1374,14 @@ class MainWindow(QMainWindow):
         if removed:
             self._current = None
             self.reading_pane.clear()
+
+    # ---------------------------------------------------------------- smart
+    def open_opencode(self):
+        """Open the Opencode assistant for the currently selected email."""
+        from .opencode_dialog import OpencodeDialog
+        row = self.message_list.first_selected()
+        dialog = OpencodeDialog(row, self)
+        dialog.exec_()
 
     def _accounts_changed(self):
         self.refresh_folder_pane()

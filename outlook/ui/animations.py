@@ -25,9 +25,11 @@ from PyQt5.QtCore import (
     QAbstractAnimation,
     QEasingCurve,
     QPropertyAnimation,
+    QSequentialAnimationGroup,
     QTimer,
     QVariantAnimation,
     Qt,
+    QParallelAnimationGroup,
     QObject,
 )
 from PyQt5.QtWidgets import QGraphicsOpacityEffect, QHBoxLayout, QVBoxLayout, QWidget
@@ -37,6 +39,7 @@ ANIM_EASE_SOFT = QEasingCurve.OutQuart
 ANIM_EASE_IN_OUT = QEasingCurve.InOutCubic
 ANIM_EASE_OUT_BACK = QEasingCurve.OutBack
 ANIM_EASE_ELASTIC = QEasingCurve.OutElastic
+ANIM_EASE_SPRING = QEasingCurve.OutBack  # subtle spring for personality
 
 
 def enabled():
@@ -191,7 +194,7 @@ def stagger(spec, base_delay=0):
         prime(widget)
         QTimer.singleShot(
             int(base_delay + delay),
-            lambda w=widget, d=int(duration): fade_in(w, d, ease=ANIM_EASE_SOFT))
+            lambda w=widget, d=int(duration): fade_in(w, d, curve=ANIM_EASE_SOFT))
 
 
 def pulse(widget, duration=2000, low=0.72):

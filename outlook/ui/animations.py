@@ -28,8 +28,15 @@ from PyQt5.QtCore import (
     QTimer,
     QVariantAnimation,
     Qt,
+    QObject,
 )
-from PyQt5.QtWidgets import QGraphicsOpacityEffect
+from PyQt5.QtWidgets import QGraphicsOpacityEffect, QHBoxLayout, QVBoxLayout, QWidget
+
+ANIM_EASE = QEasingCurve.OutCubic
+ANIM_EASE_SOFT = QEasingCurve.OutQuart
+ANIM_EASE_IN_OUT = QEasingCurve.InOutCubic
+ANIM_EASE_OUT_BACK = QEasingCurve.OutBack
+ANIM_EASE_ELASTIC = QEasingCurve.OutElastic
 
 
 def enabled():
@@ -71,8 +78,8 @@ def prime(widget):
         return None
 
 
-def fade_in(widget, duration=280, start=0.0, end=1.0,
-            curve=QEasingCurve.OutQuint):
+def fade_in(widget, duration=320, start=0.0, end=1.0,
+            curve=ANIM_EASE_SOFT):
     """Fade a widget in. Returns the animation, or ``None`` when disabled."""
     if not enabled() or widget is None:
         return None
@@ -91,8 +98,8 @@ def fade_in(widget, duration=280, start=0.0, end=1.0,
         return None
 
 
-def fade_window(window, duration=340, start=0.0, end=1.0,
-                curve=QEasingCurve.OutQuart):
+def fade_window(window, duration=360, start=0.0, end=1.0,
+                curve=ANIM_EASE_SOFT):
     """Animate a top-level window's native opacity (painter-safe on X11)."""
     if not enabled() or window is None:
         return None
@@ -124,8 +131,8 @@ def _restore_layout(widget):
     widget._ot_base_margins = None
 
 
-def slide_in(widget, layout, distance=10, duration=300, axis=Qt.Vertical,
-             curve=QEasingCurve.OutQuint):
+def slide_in(widget, layout, distance=12, duration=340, axis=Qt.Vertical,
+             curve=ANIM_EASE_SOFT):
     """Fade in *widget* while it slides *distance* px inside *layout*.
 
     ``axis == Qt.Vertical``  rises up (reading pane),
@@ -184,7 +191,7 @@ def stagger(spec, base_delay=0):
         prime(widget)
         QTimer.singleShot(
             int(base_delay + delay),
-            lambda w=widget, d=duration: fade_in(w, d))
+            lambda w=widget, d=int(duration): fade_in(w, d, ease=ANIM_EASE_SOFT))
 
 
 def pulse(widget, duration=2000, low=0.72):

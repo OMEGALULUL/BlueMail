@@ -22,7 +22,7 @@ SELECT_BORDER = "#9dc9ef"
 RED = "#d13438"
 GREEN = "#107c10"
 
-FONT_FAMILIES = ["Segoe UI", "Noto Sans", "DejaVu Sans", "sans-serif"]
+FONT_FAMILIES = ["Inter", "Segoe UI", "Noto Sans", "DejaVu Sans", "sans-serif"]
 
 
 def app_font() -> QFont:
@@ -31,7 +31,8 @@ def app_font() -> QFont:
         font.setFamilies(FONT_FAMILIES)
     except AttributeError:
         font = QFont(FONT_FAMILIES[0])
-    font.setPointSize(10)
+    font.setPointSize(11)
+    font.setLetterSpacing(QFont.PercentageSpacing, 96.0)
     return font
 
 
@@ -60,9 +61,13 @@ STYLESHEET = f"""
 QMainWindow, QDialog {{
     background: {WHITE};
 }}
-QLabel {{
-    background: transparent;
+QToolTip {{
+    font-size: 10px;
+    background: {WHITE};
     color: {TEXT};
+    padding: 4px 6px;
+    border: 1px solid {BORDER};
+    border-radius: 6px;
 }}
 QToolTip {{
     background: {WHITE};
@@ -74,8 +79,8 @@ QToolTip {{
 
 /* ---------------------------------------------------------------- ribbon */
 QWidget#ribbon {{
-    background: {CHROME};
-    border-bottom: 1px solid {BORDER};
+    background: #f5f5f6;
+    border-bottom: 1px solid #e3e2e1;
 }}
 QToolButton#fileTab {{
     background: {BLUE_DARK};
@@ -98,39 +103,47 @@ QTabBar#ribbonTabs::tab {{
     color: #444;
     border: none;
     padding: 7px 16px 6px 16px;
-    margin: 0;
+    margin: 2px 4px 0 0;
     font-size: 12px;
     min-width: 40px;
+    border-radius: 10px 10px 0 0;
+    transition: background 160ms ease-out;
 }}
 QTabBar#ribbonTabs::tab:hover {{
-    background: #e1dfdd;
+    background: #eef2f8;
     color: {TEXT};
 }}
 QTabBar#ribbonTabs::tab:selected {{
     background: {WHITE};
     color: {BLUE};
-    font-weight: bold;
+    font-weight: 600;
+    border: 1px solid #e6e8ee;
     border-bottom: 2px solid {BLUE};
+    margin-bottom: -1px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }}
 QToolButton#ribbonButton {{
     background: transparent;
     color: {TEXT};
     border: 1px solid transparent;
-    border-radius: 3px;
-    padding: 4px 6px;
+    border-radius: 8px;
+    padding: 6px 6px 4px 6px;
     font-size: 11px;
+    font-weight: 500;
+    transition: all 120ms ease-out;
 }}
 QToolButton#ribbonButton:hover {{
-    background: {BLUE_LIGHT};
-    border: 1px solid {SELECT_BORDER};
+    background: rgba(0, 120, 212, 0.04);
+    border: 1px solid #e6e8ee;
 }}
 QToolButton#ribbonButton:pressed {{
-    background: #a6d4f2;
-    border: 1px solid #7bb8e8;
+    background: rgba(0, 120, 212, 0.12);
+    border: 1px solid #d5e3ff;
 }}
 QToolButton#ribbonButton:checked {{
-    background: {BLUE_LIGHT};
-    border: 1px solid {SELECT_BORDER};
+    background: rgba(0, 120, 212, 0.12);
+    color: {BLUE};
+    border: 1px solid #b8d1ff;
 }}
 QToolButton#ribbonButton:disabled {{
     color: #a19f9d;
@@ -172,34 +185,41 @@ QFrame#ribbonFrame {{
 
 /* ------------------------------------------------------------ welcome */
 QWidget#welcomePage {{
-    background: {WHITE};
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #ffffff, stop:1 #fbfcfe);
 }}
 QWidget#welcomeBand {{
     background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                                stop:0 #2b579a, stop:1 #1f427a);
+                                stop:0 #2b579a, stop:1 #1a2f5e);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }}
 QLabel#welcomeTitle {{
     color: {WHITE};
-    font-size: 21px;
-    font-weight: bold;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
 }}
 QLabel#welcomeSubtitle {{
-    color: #b9c7e8;
+    color: #dce5f5;
     font-size: 12px;
+    opacity: 0.9;
 }}
 QLabel#welcomeHeading {{
     color: {TEXT};
-    font-size: 26px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
 }}
 QLabel#welcomeHint {{
-    color: {MUTED};
+    color: #3d3d3d;
     font-size: 13px;
+    line-height: 1.6;
 }}
 QLabel#welcomeFooter {{
-    background: {CHROME};
-    color: {MUTED};
+    background: #f7f8fa;
+    color: #6b6b6b;
     font-size: 11px;
-    border-top: 1px solid {BORDER_SOFT};
+    border-top: 1px solid #eef0f5;
 }}
 QLabel#welcomeProvidersLabel {{
     color: {MUTED};
@@ -208,18 +228,22 @@ QLabel#welcomeProvidersLabel {{
 QPushButton#providerChip {{
     background: {WHITE};
     color: {TEXT};
-    border: 1px solid {BORDER};
-    border-radius: 15px;
-    padding: 7px 18px;
+    border: 1px solid #e6e8ee;
+    border-radius: 20px;
+    padding: 8px 20px;
     font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(15, 20, 40, 0.04);
 }}
 QPushButton#providerChip:hover {{
-    background: {BLUE_LIGHTER};
+    background: #f9fbff;
     border: 1px solid {BLUE};
-    color: {BLUE_HOVER};
+    color: {BLUE};
+    box-shadow: 0 4px 10px rgba(15, 20, 40, 0.08);
 }}
 QPushButton#providerChip:pressed {{
-    background: {SELECT_BG};
+    background: #f1f6ff;
+    box-shadow: 0 1px 3px rgba(15, 20, 40, 0.08) inset;
 }}
 QWidget#welcomePage QPushButton {{
     font-size: 13px;

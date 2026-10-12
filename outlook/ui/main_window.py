@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
         band = QWidget()
         band.setObjectName("welcomeBand")
         self.welcome_band = band
-        band.setFixedHeight(96)
+        band.setFixedHeight(108)
         bh = QHBoxLayout(band)
         bh.setContentsMargins(44, 0, 0, 0)
         bh.setSpacing(18)
@@ -350,8 +350,8 @@ class MainWindow(QMainWindow):
         add_btn = QPushButton("Add Account…")
         add_btn.setObjectName("primary")
         add_btn.setIcon(icons.icon("account", 20))
-        add_btn.setIconSize(QSize(20, 20))
-        add_btn.setFixedSize(210, 42)
+        add_btn.setIconSize(QSize(22, 22))
+        add_btn.setFixedSize(240, 48)
         add_btn.setCursor(Qt.PointingHandCursor)
         add_btn.clicked.connect(
             lambda _c=False: self.open_account_settings(None))
